@@ -2,7 +2,7 @@
 
 A script which relays email from Amazon AWS SES into a local mail server. No port-forwarding is required thanks to the use of Cloudflare tunnels to proxy inbound SNS traffic.
 
-This is possible because AWS supports recieving mail and transporting it within a HTTP request through the use of [SNS](https://aws.amazon.com/sns/) (Simple Notification Service).
+This is possible because AWS supports receiving mail and transporting it within a HTTP request through the use of [SNS](https://aws.amazon.com/sns/) (Simple Notification Service).
 
 You are still required to host your own mail server, it's just that all the usual pitfalls (security, maintenance, reputation) are overcome thanks to it not being internet-facing. In fact, the entire thing could operate behind a CG-NAT if required.
 
@@ -16,7 +16,9 @@ You will need an AWS account, and you'll need to apply for SES (Simple Email Ser
 
 From the Cloudflare dashboard, select 'Zero trust', 'Access', then 'Tunnels'. Create a new [tunnel](https://www.cloudflare.com/en-gb/products/tunnel/), name it however you like and then click 'Save'. Note down the Cloudflare tunnel token.
 
-Setup the required [AWS MX records](https://docs.aws.amazon.com/ses/latest/dg/receiving-email-mx-record.html#receiving-email-mx-record-links) on your Cloudflare DNS dashboard for recieving mail using SES. 
+Select the tunnel you just created and under 'Public Hostname', select 'Add public hostname'. Selecting a subdomain is optional, but recommended (ex: `relay.example.com`). Leave path blank. Select type 'HTTP' and for URL enter `proxy-example:8080` (replace `example` with your organisation name). Click save.
+
+Setup the required [AWS MX records](https://docs.aws.amazon.com/ses/latest/dg/receiving-email-mx-record.html#receiving-email-mx-record-links) on your Cloudflare DNS dashboard for receiving mail using SES. 
 
 In the AWS console, create an S3 bucket for temporarily holding mail, make a note of the name of the bucket and apply the following [bucket policy](https://docs.aws.amazon.com/AmazonS3/latest/userguide/access-policy-language-overview.html?icmpid=docs_amazons3_console).
 
@@ -122,7 +124,7 @@ Copy the example compose YAML files and environment files.
 | ⚠️  Repeat for multiple AWS accounts or regions.
 
 ```sh
-ORG_NAME=example cp .org.docker-compose.yml.example $ORG_NAME.org.docker-compose.yml && cp .org.env.example $ORG_NAME.org.env
+ORG_NAME=example; cp .org.docker-compose.yml.example $ORG_NAME.org.docker-compose.yml && cp .org.env.example $ORG_NAME.org.env && cp .env.example .env
 ```
 
 Set the Cloudflare tunnel token and Docker network name.
