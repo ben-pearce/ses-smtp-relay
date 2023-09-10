@@ -1,0 +1,11 @@
+version: "3.8"
+services:
+
+  proxy-example:
+    build:
+      context: .
+      dockerfile: proxy.Dockerfile
+    container_name: ses-proxy-example
+    env_file:
+      - example.organisation.env
+    restart: unless-stopped

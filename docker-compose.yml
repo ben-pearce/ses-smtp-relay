@@ -1,0 +1,15 @@
+version: "3.8"
+
+services:
+  cloudflared:
+    image: cloudflare/cloudflared:latest
+    container_name: cloudflared
+    restart: unless-stopped
+    command: tunnel run --token ${CLOUDFLARED_TOKEN}
+    volumes:
+      - .data/cloudflared/data:/home/nonroot/.cloudflared/
+
+networks:
+  default:
+    name: ${DOCKER_NETWORK}
+    external: true
