@@ -7,5 +7,5 @@ services:
       dockerfile: proxy.Dockerfile
     container_name: ses-proxy-example
     env_file:
-      - example.organisation.env
+      - example.org.env
     restart: unless-stopped
