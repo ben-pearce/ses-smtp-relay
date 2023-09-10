@@ -16,7 +16,7 @@ You will need an AWS account, and you'll need to apply for SES (Simple Email Ser
 
 From the Cloudflare dashboard, select 'Zero trust', 'Access', then 'Tunnels'. Create a new [tunnel](https://www.cloudflare.com/en-gb/products/tunnel/), name it however you like and then click 'Save'. Note down the Cloudflare tunnel token.
 
-Select the tunnel you just created and under 'Public Hostname', select 'Add public hostname'. Selecting a subdomain is optional, but recommended (ex: `relay.example.com`). Leave path blank. Select type 'HTTP' and for URL enter `proxy-example:8080` (replace `example` with your organisation name). Click save.
+Select the tunnel you just created and under 'Public Hostname', select 'Add public hostname'. Selecting a subdomain is optional, but recommended (ex: `relay.example.com`). Leave path blank. Select type 'HTTP' and for URL enter `ses-proxy-example:8080` (replace `example` with your organisation name). Click save.
 
 Setup the required [AWS MX records](https://docs.aws.amazon.com/ses/latest/dg/receiving-email-mx-record.html#receiving-email-mx-record-links) on your Cloudflare DNS dashboard for receiving mail using SES. 
 
