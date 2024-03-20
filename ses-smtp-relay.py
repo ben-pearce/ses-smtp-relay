@@ -42,11 +42,11 @@ def s3_recv():
             msg = email.message_from_binary_file(f)
             from_addr = msg.get('From')
             for to_addrs in email.utils.getaddresses(
-                itertools.chain(
+                filter(None, itertools.chain(
                     msg.get_all('to', []),
                     msg.get_all('cc', []),
                     msg.get_all('bcc', [])
-                )
+                ))
             ):
                 with smtplib.SMTP(
                     os.environ.get('SMTP_HOST'), 
