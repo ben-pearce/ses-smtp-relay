@@ -1,13 +1,38 @@
 version: "3.8"
 
+secrets:
+  cloudflared_cert:
+    file: ./.secrets/cloudflared_cert
+  cloudflared_token:
+    file: ./.secrets/cloudflared_token
+  aws_credentials:
+    file: ./.secrets/aws_credentials
+
 services:
+  proxy:
+    image: ghcr.io/ben-pearce/ses-smtp-relay:latest
+    container_name: ses-proxy
+    restart: unless-stopped
+    environment:
+      - S3_BUCKET_NAME
+      - SMTP_HOST
+      - SMTP_PORT
+      - POSTMASTER_MAILBOX
+    secrets:
+      - aws_credentials
+      - source: aws_credentials
+        target: /etc/boto.cfg
+
   cloudflared:
     image: cloudflare/cloudflared:latest
     container_name: cloudflared
     restart: unless-stopped
-    command: tunnel run --token ${CLOUDFLARED_TOKEN}
-    volumes:
-      - .data/cloudflared/data:/home/nonroot/.cloudflared/
+    command: tunnel --credentials-file /run/secrets/cloudflared_token run rc
+    secrets:
+      - cloudflared_token
+      - source: cloudflared_cert
+        target: /etc/cloudflared/cert.pem
+    user: ${PUID}
 
 networks:
   default:

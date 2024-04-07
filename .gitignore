@@ -1,3 +1,4 @@
+.secrets
 .env
 *.org.env
 *.org.docker-compose.yml
