@@ -84,7 +84,6 @@ async def relay(request):
 
     try:
         message = await request.json()
-        print(message)
     except json.decoder.JSONDecodeError as e:
         logger.error(e)
         raise web.HTTPBadRequest('Request body is not in json format.')
@@ -122,6 +121,7 @@ async def relay(request):
         await relay_lock.acquire()
         await loop.run_in_executor(None, s3_recv)
         relay_lock.release()
+        return web.Response(status=200)
 
 if __name__ == '__main__':
     app = web.Application()
