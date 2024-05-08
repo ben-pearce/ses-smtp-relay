@@ -59,14 +59,13 @@ def s3_recv():
                                 os.environ.get('SMTP_PASSWORD')
                             )
                         s.sendmail(from_addr, to_addrs, msg.as_bytes())
-                    except smtplib.SMTPRecipientsRefused as e:
-                        logger.error(e)
-                        s.sendmail(from_addr, os.environ.get('POSTMASTER_MAILBOX'), msg.as_bytes())
                     except smtplib.SMTPException as e:
                         logger.error(e)
-                        exit()
+                        s.docmd('RSET')
+                        s.sendmail(from_addr, os.environ.get('POSTMASTER_MAILBOX'), msg.as_bytes())
                     except Exception as e:
                         logger.error(e)
+                        s.docmd('RSET')
                         s.sendmail(from_addr, os.environ.get('POSTMASTER_MAILBOX'), str(e))
             s3.delete_object(
                 Bucket=os.environ.get('S3_BUCKET_NAME'), 
