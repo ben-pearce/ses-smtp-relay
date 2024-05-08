@@ -1,5 +1,3 @@
-version: "3.8"
-
 secrets:
   cloudflared_cert:
     file: ./.secrets/cloudflared_cert
