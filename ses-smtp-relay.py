@@ -1,14 +1,14 @@
 import smtplib
 import logging
-import aiohttp
-import boto3
 import os
 import io
 import email
 import asyncio
 import json
-from aiohttp import web
 import itertools
+import aiohttp
+import boto3
+from aiohttp import web
 from sns_message_validator import (
     InvalidMessageTypeException,
     InvalidCertURLException,
