@@ -6,6 +6,11 @@ import email
 import asyncio
 import json
 import itertools
+from email.mime.multipart import MIMEMultipart
+from email.mime.base import MIMEBase
+from email.mime.text import MIMEText
+from email.utils import formatdate
+from email import encoders
 import aiohttp
 import boto3
 from aiohttp import web
@@ -61,14 +66,31 @@ def s3_recv():
                         s.sendmail(from_addr, to_addrs, msg.as_bytes())
                     except smtplib.SMTPException as e:
                         logger.error(e)
+
+                        fwd = MIMEMultipart()
+                        fwd['From'] = os.environ.get('POSTMASTER_MAILBOX')
+                        fwd['To'] = os.environ.get('POSTMASTER_MAILBOX')
+                        fwd['Date'] = formatdate(localtime=True)
+                        fwd['Subject'] = f'Message delivery failure from {from_addr}'
+                        fwd.attach(MIMEText(str(e)))
+
+                        part = MIMEBase('application', "octet-stream")
+                        part.set_payload(msg.as_bytes())
+                        encoders.encode_base64(part)
+                        part.add_header(
+                            'Content-Disposition', 
+                            f'attachment; filename={msg["Subject"]}.eml'
+                        )
+                        fwd.attach(part)
+
                         s.docmd('RSET')
-                        s.sendmail(from_addr, os.environ.get('POSTMASTER_MAILBOX'), msg.as_bytes())
-                    except Exception as e:
-                        logger.error(e)
-                        s.docmd('RSET')
-                        s.sendmail(from_addr, os.environ.get('POSTMASTER_MAILBOX'), str(e))
+                        s.sendmail(
+                            os.environ.get('POSTMASTER_MAILBOX'),
+                            os.environ.get('POSTMASTER_MAILBOX'),
+                            fwd.as_bytes()
+                        )
             s3.delete_object(
-                Bucket=os.environ.get('S3_BUCKET_NAME'), 
+                Bucket=os.environ.get('S3_BUCKET_NAME'),
                 Key=o.get('Key')
             )
 
