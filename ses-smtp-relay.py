@@ -79,32 +79,32 @@ async def relay(request):
         sns_message_validator.validate_message_type(message_type)
     except InvalidMessageTypeException as e:
         logger.error(e)
-        raise web.HTTPBadRequest('Invalid message type.')
+        raise web.HTTPBadRequest(text='Invalid message type.')
 
     try:
         message = await request.json()
     except json.decoder.JSONDecodeError as e:
         logger.error(e)
-        raise web.HTTPBadRequest('Request body is not in json format.')
+        raise web.HTTPBadRequest(text='Request body is not in json format.')
 
     try:
         sns_message_validator.validate_message(message=message)
     except InvalidCertURLException as e:
         logger.error(e)
-        raise web.HTTPBadRequest('Invalid certificate URL.')
+        raise web.HTTPBadRequest(text='Invalid certificate URL.')
     except InvalidSignatureVersionException as e:
         logger.error(e)
-        raise web.HTTPBadRequest('Unexpected signature version.')
+        raise web.HTTPBadRequest(text='Unexpected signature version.')
     except SignatureVerificationFailureException as e:
         logger.error(e)
-        raise web.HTTPBadRequest('Failed to verify signature.')
+        raise web.HTTPBadRequest(text='Failed to verify signature.')
 
     if message_type == SNSMessageType.SubscriptionConfirmation.value:
         async with aiohttp.ClientSession() as session:
             async with session.get(message.get('SubscribeURL')) as resp:
                 if resp.status != 200:
                     logger.error(resp)
-                    raise web.HTTPInternalServerError('Request to SubscribeURL failed.')
+                    raise web.HTTPInternalServerError(text='Request to SubscribeURL failed.')
         return web.Response(text='Subscription is successfully confirmed.')
 
     if message_type == SNSMessageType.UnsubscribeConfirmation.value:
@@ -112,7 +112,7 @@ async def relay(request):
             async with session.get(message.get('UnsubscribeURL')) as resp:
                 if resp.status != 200:
                     logger.error(resp)
-                    raise web.HTTPInternalServerError('Request to UnsubscribeURL failed.')
+                    raise web.HTTPInternalServerError(text='Request to UnsubscribeURL failed.')
         return web.Response(text='Successfully unsubscribed.')
 
     if message_type == SNSMessageType.Notification.value:
